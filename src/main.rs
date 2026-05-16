@@ -1,15 +1,21 @@
-//! lancer-subfinder
-//! Rust clone of subfinder. See plan.md (local, gitignored) for the spec.
+//! lancer-subfinder — Rust clone of ProjectDiscovery subfinder.
+//! Passive subdomain enumeration across 30+ sources.
+
+use std::process::ExitCode;
 
 use clap::Parser;
+use lancer_subfinder::cli::Cli;
+use lancer_subfinder::run;
 
-#[derive(Parser, Debug)]
-#[command(name = "lancer-subfinder", version, about = "Rust clone of subfinder")]
-struct Cli {}
-
-fn main() -> anyhow::Result<()> {
-    tracing_subscriber::fmt::init();
-    let _cli = Cli::parse();
-    println!("lancer-subfinder - scaffold ready. Implement per plan.md.");
-    Ok(())
+#[tokio::main]
+async fn main() -> ExitCode {
+    let cli = Cli::parse();
+    lancer_subfinder::logging::init(cli.silent, cli.verbose);
+    match run(cli).await {
+        Ok(code) => code,
+        Err(e) => {
+            tracing::error!("fatal: {:#}", e);
+            ExitCode::from(1)
+        }
+    }
 }
