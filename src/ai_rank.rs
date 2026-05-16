@@ -132,7 +132,7 @@ async fn rank_inner(subdomains: &[String]) -> Result<Vec<String>> {
         .collect();
 
     // Append any originals that Claude dropped (shouldn't happen but be safe)
-    let seen: std::collections::HashSet<&str> = ranked.iter().map(|s| s.as_str()).collect();
+    let seen: std::collections::HashSet<String> = ranked.iter().cloned().collect();
     for s in subdomains {
         if !seen.contains(s.as_str()) {
             ranked.push(s.clone());
